@@ -4,26 +4,44 @@
 #pragma once
 
 #include <vk_types.h>
+#include <vector>
 
 class VulkanEngine {
 public:
 
-	bool _isInitialized{ false };
-	int _frameNumber {0};
+    VkInstance _instance; // Vulkan library handle
+    VkDebugUtilsMessengerEXT _debugMessenger; // Vulkan debug output handle
+    VkPhysicalDevice _chosenGPU; // GPU chosen as the default hardware device
+    VkDevice _device; // Logical Vulkan device for commands
+    VkSurfaceKHR _surface; // Vulkan window service
 
-	VkExtent2D _windowExtent{ 1700 , 900 };
+    VkSwapchainKHR _swapchain;
+    VkFormat _swapchainImageFormat; // image format expected by the windowing system
+    std::vector<VkImage> _swapchainImages;
+    std::vector<VkImageView> _swapchainImageViews;
 
-	struct SDL_Window* _window{ nullptr };
+    VkExtent2D _windowExtent{1700, 900};
 
-	//initializes everything in the engine
-	void init();
+    struct SDL_Window *_window{nullptr};
 
-	//shuts down the engine
-	void cleanup();
+    bool _isInitialized{false};
+    int _frameNumber{0};
 
-	//draw loop
-	void draw();
+    //initializes everything in the engine
+    void Init();
 
-	//run main loop
-	void run();
+    //shuts down the engine
+    void Cleanup() const;
+
+    //draw loop
+    void Draw();
+
+    //run main loop
+    void Run();
+
+private:
+
+    void InitVulcan();
+
+    void InitSwapchain();
 };
