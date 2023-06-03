@@ -153,7 +153,7 @@ void VulkanEngine::Draw()
     // render commands go here
     if (_selectedShader == 0)
     {
-        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _trianglePipeline);
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _rainbowTrianglePipeline);
     }
     else
     {
@@ -442,41 +442,41 @@ void VulkanEngine::InitPipelines()
     VkShaderModule redTriangleFragmentShader; // TODO: this is currently leaked
     if (!LoadShaderModule("../shaders/triangle.frag.spv", &redTriangleFragmentShader))
     {
-        std::cout << "Error when building the triangle fragment shader module" << std::endl;
+        std::cout << "Error when building the red triangle fragment shader module" << std::endl;
     }
     else
     {
-        std::cout << "Triangle fragment shader successfully loaded" << std::endl;
+        std::cout << "Red triangle fragment shader successfully loaded" << std::endl;
     }
 
     VkShaderModule redTriangleVertexShader; // TODO: this is currently leaked
     if (!LoadShaderModule("../shaders/triangle.vert.spv", &redTriangleVertexShader))
     {
-        std::cout << "Error when building the triangle vertex shader module" << std::endl;
+        std::cout << "Error when building the red triangle vertex shader module" << std::endl;
     }
     else
     {
-        std::cout << "Triangle vertex shader successfully loaded" << std::endl;
+        std::cout << "Red triangle vertex shader successfully loaded" << std::endl;
     }
 
-    VkShaderModule triangleFragmentShader; // TODO: this is currently leaked
-    if (!LoadShaderModule("../shaders/colouredTriangle.frag.spv", &triangleFragmentShader))
+    VkShaderModule rainbowTriangleFragmentShader; // TODO: this is currently leaked
+    if (!LoadShaderModule("../shaders/rainbowTriangle.frag.spv", &rainbowTriangleFragmentShader))
     {
-        std::cout << "Error when building the triangle fragment shader module" << std::endl;
+        std::cout << "Error when building the rainbow triangle fragment shader module" << std::endl;
     }
     else
     {
-        std::cout << "Triangle fragment shader successfully loaded" << std::endl;
+        std::cout << "Rainbow triangle fragment shader successfully loaded" << std::endl;
     }
 
-    VkShaderModule triangleVertexShader; // TODO: this is currently leaked
-    if (!LoadShaderModule("../shaders/colouredTriangle.vert.spv", &triangleVertexShader))
+    VkShaderModule rainbowTriangleVertexShader; // TODO: this is currently leaked
+    if (!LoadShaderModule("../shaders/rainbowTriangle.vert.spv", &rainbowTriangleVertexShader))
     {
-        std::cout << "Error when building the triangle vertex shader module" << std::endl;
+        std::cout << "Error when building the rainbow triangle vertex shader module" << std::endl;
     }
     else
     {
-        std::cout << "Triangle vertex shader successfully loaded" << std::endl;
+        std::cout << "Rainbow triangle vertex shader successfully loaded" << std::endl;
     }
 
     // build the pipeline layout that controls the inputs and outputs of the shader
@@ -491,12 +491,13 @@ void VulkanEngine::InitPipelines()
 
     // add vertex shader stage
     pipelineBuilder.ShaderStages.push_back(
-            VulkanInitialisers::PipelineShaderStageCreateInfo(VK_SHADER_STAGE_VERTEX_BIT, triangleVertexShader)
+            VulkanInitialisers::PipelineShaderStageCreateInfo(VK_SHADER_STAGE_VERTEX_BIT, rainbowTriangleVertexShader)
     );
 
     // add fragment shader stage
     pipelineBuilder.ShaderStages.push_back(
-            VulkanInitialisers::PipelineShaderStageCreateInfo(VK_SHADER_STAGE_FRAGMENT_BIT, triangleFragmentShader)
+            VulkanInitialisers::PipelineShaderStageCreateInfo(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                              rainbowTriangleFragmentShader)
     );
 
     // vertex input controls how to read vertices from vertex buffers, not using it yet
@@ -528,8 +529,8 @@ void VulkanEngine::InitPipelines()
     // triangle layout
     pipelineBuilder.PipelineLayout = _trianglePipelineLayout;
 
-    // woot, lets build the coloured triangle pipeline
-    _trianglePipeline = pipelineBuilder.BuildPipeline(_device, _renderPass);
+    // woot, lets build the rainbow triangle pipeline
+    _rainbowTrianglePipeline = pipelineBuilder.BuildPipeline(_device, _renderPass);
 
     // now we want to build another pipeline for the static red triangle
     // first we need to clear the existing shader stages from the other triangle pipeline

@@ -67,7 +67,7 @@ private:
     VkFence _renderFence;
 
     VkPipelineLayout _trianglePipelineLayout;
-    VkPipeline _trianglePipeline;
+    VkPipeline _rainbowTrianglePipeline;
     VkPipeline _redTrianglePipeline;
 
     VkExtent2D _windowExtent{640, 320};
