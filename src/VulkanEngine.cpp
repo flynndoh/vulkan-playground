@@ -3,9 +3,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_vulkan.h>
 #include <VkBootstrap.h>
+#include <fstream>
 
 #include "VulkanEngine.h"
 #include "VulkanInitialisers.h"
+#include "PipelineBuilder.h"
 
 // We want to immediately abort when there is an error. In normal engines this would give an error message to the user,
 // or perform a dump of state.
@@ -52,6 +54,8 @@ void VulkanEngine::Init()
 
     // create fences to sync comms from the GPU to the CPU. Create semaphores to sync comms between GPU and GPU
     InitSyncStructures();
+
+    InitPipelines();
 
     // everything went fine
     _isInitialized = true;
@@ -145,6 +149,9 @@ void VulkanEngine::Draw()
 
     // begin this render pass
     vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _trianglePipeline);
+    vkCmdDraw(commandBuffer, 3, 1, 0, 0);
 
     // finalise this render pass
     vkCmdEndRenderPass(commandBuffer);
@@ -405,4 +412,127 @@ void VulkanEngine::InitSyncStructures()
 
     // create rendering semaphore
     VK_CHECK(vkCreateSemaphore(_device, &semaphoreInfo, nullptr, &_renderSemaphore));
+}
+
+void VulkanEngine::InitPipelines()
+{
+    VkShaderModule triangleFragmentShader; // TODO: this is currently leaked
+    if (!LoadShaderModule("../shaders/triangle.frag.spv", &triangleFragmentShader))
+    {
+        std::cout << "Error when building the triangle fragment shader module" << std::endl;
+    }
+    else
+    {
+        std::cout << "Triangle fragment shader successfully loaded" << std::endl;
+    }
+
+    VkShaderModule triangleVertexShader; // TODO: this is currently leaked
+    if (!LoadShaderModule("../shaders/triangle.vert.spv", &triangleVertexShader))
+    {
+        std::cout << "Error when building the triangle vertex shader module" << std::endl;
+    }
+    else
+    {
+        std::cout << "Triangle vertex shader successfully loaded" << std::endl;
+    }
+
+    // build the pipeline layout that controls the inputs and outputs of the shader
+    // i'm not using descriptor sets or other systems yet, so no need to use anything other than empty defaults
+    VkPipelineLayoutCreateInfo pipelineLayoutInfo = VulkanInitialisers::PipelineLayoutCreateInfo();
+
+    VK_CHECK(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, nullptr, &_trianglePipelineLayout));
+
+    // build the stage creation info for both vertex and fragment stages.
+    // this lets the pipeline know the shader modules per stage
+    PipelineBuilder pipelineBuilder;
+
+    // add vertex shader stage
+    pipelineBuilder.ShaderStages.push_back(
+            VulkanInitialisers::PipelineShaderStageCreateInfo(VK_SHADER_STAGE_VERTEX_BIT, triangleVertexShader)
+    );
+
+    // add fragment shader stage
+    pipelineBuilder.ShaderStages.push_back(
+            VulkanInitialisers::PipelineShaderStageCreateInfo(VK_SHADER_STAGE_FRAGMENT_BIT, triangleFragmentShader)
+    );
+
+    // vertex input controls how to read vertices from vertex buffers, not using it yet
+    pipelineBuilder.VertexInputInfo = VulkanInitialisers::VertexInputStateCreateInfo();
+
+    // input assembly is the configuration for drawing triangle lists, strips or individual points
+    pipelineBuilder.InputAssembly = VulkanInitialisers::InputAssemblyCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+
+    // build viewport and scissor from the swapchain extents
+    pipelineBuilder.Viewport.x = 0.0f;
+    pipelineBuilder.Viewport.y = 0.0f;
+    pipelineBuilder.Viewport.width = (float) _windowExtent.width;
+    pipelineBuilder.Viewport.height = (float) _windowExtent.height;
+    pipelineBuilder.Viewport.minDepth = 0.0f;
+    pipelineBuilder.Viewport.maxDepth = 1.0f;
+
+    pipelineBuilder.Scissor.offset = {0, 0};
+    pipelineBuilder.Scissor.extent = _windowExtent;
+
+    // configure the rasteriser to draw full triangles
+    pipelineBuilder.Rasteriser = VulkanInitialisers::RasterisationStateCreateInfo(VK_POLYGON_MODE_LINE);
+
+    // default multisampling (1 sample per pixel)
+    pipelineBuilder.Multisampling = VulkanInitialisers::MultisamplingStateCreateInfo();
+
+    // single blend attachment with no blending and writing to RGBA
+    pipelineBuilder.ColourBlendAttachment = VulkanInitialisers::ColorBlendAttachmentState();
+
+    // triangle layout
+    pipelineBuilder.PipelineLayout = _trianglePipelineLayout;
+
+    // woot, lets build this fucker
+    _trianglePipeline = pipelineBuilder.BuildPipeline(_device, _renderPass);
+
+}
+
+bool VulkanEngine::LoadShaderModule(const char *filePath, VkShaderModule *outShaderModule)
+{
+    // open the shader file with the cursor at the end (ios::ate) and in binary mode (ios::binary)
+    std::ifstream file(filePath, std::ios::ate | std::ios::binary);
+
+    if (!file.is_open())
+    {
+        return false;
+    }
+
+    // determine the file size by looking at the location of the cursor. Because the cursor is at the end of the file,
+    // we get the size directly in bytes
+    size_t fileSize = (size_t) file.tellg();
+
+    // spirv expects the bugger to be in uint32, so we need to make sure to reserve an int vector big enough for the
+    // entire shader file
+    std::vector<uint32_t> buffer(fileSize / sizeof(uint32_t));
+
+    // reset cursor to beginning of file
+    file.seekg(0);
+
+    // load the entire file into the buffer
+    file.read((char *) buffer.data(), fileSize);
+
+    // now that the file is loaded into the buffer, we can close it like the tidy kiwi I am ;)
+    file.close();
+
+    // create a new shader module, using the above buffer
+    VkShaderModuleCreateInfo createInfo = {}; // initialise struct with 0's
+    createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    createInfo.pNext = nullptr;
+
+    // codeSize has to be in bytes
+    createInfo.codeSize = buffer.size() * sizeof(uint32_t);
+    createInfo.pCode = buffer.data();
+
+    // confirm creation goes well
+    VkShaderModule shaderModule;
+    if (vkCreateShaderModule(_device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
+    {
+        return false;
+    }
+
+    *outShaderModule = shaderModule;
+    return true;
 }

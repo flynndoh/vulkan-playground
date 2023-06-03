@@ -38,6 +38,10 @@ private:
 
     void InitSyncStructures();
 
+    void InitPipelines();
+
+    bool LoadShaderModule(const char *filePath, VkShaderModule *outShaderModule);
+
 private:
     VkInstance _instance; // Vulkan library handle
     VkDebugUtilsMessengerEXT _debugMessenger; // Vulkan debug output handle
@@ -62,10 +66,11 @@ private:
     VkSemaphore _presentSemaphore, _renderSemaphore;
     VkFence _renderFence;
 
-    VkExtent2D _windowExtent{640, 380};
+    VkPipelineLayout _trianglePipelineLayout;
+    VkPipeline _trianglePipeline;
 
+    VkExtent2D _windowExtent{640, 320};
     struct SDL_Window *_window{nullptr};
     bool _isInitialized{false};
     int _frameNumber{0};
-
 };

@@ -6,7 +6,7 @@ add_executable(cpp-vulkan
         VulkanEngine.h
         VulkanTypes.h
         VulkanInitialisers.cpp
-        VulkanInitialisers.h)
+        VulkanInitialisers.h PipelineBuilder.cpp PipelineBuilder.h)
 
 
 set_property(TARGET cpp-vulkan PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:cpp-vulkan>")
