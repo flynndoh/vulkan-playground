@@ -417,7 +417,7 @@ void VulkanEngine::InitSyncStructures()
 void VulkanEngine::InitPipelines()
 {
     VkShaderModule triangleFragmentShader; // TODO: this is currently leaked
-    if (!LoadShaderModule("../shaders/triangle.frag.spv", &triangleFragmentShader))
+    if (!LoadShaderModule("../shaders/colouredTriangle.frag.spv", &triangleFragmentShader))
     {
         std::cout << "Error when building the triangle fragment shader module" << std::endl;
     }
@@ -427,7 +427,7 @@ void VulkanEngine::InitPipelines()
     }
 
     VkShaderModule triangleVertexShader; // TODO: this is currently leaked
-    if (!LoadShaderModule("../shaders/triangle.vert.spv", &triangleVertexShader))
+    if (!LoadShaderModule("../shaders/colouredTriangle.vert.spv", &triangleVertexShader))
     {
         std::cout << "Error when building the triangle vertex shader module" << std::endl;
     }
@@ -474,7 +474,7 @@ void VulkanEngine::InitPipelines()
     pipelineBuilder.Scissor.extent = _windowExtent;
 
     // configure the rasteriser to draw full triangles
-    pipelineBuilder.Rasteriser = VulkanInitialisers::RasterisationStateCreateInfo(VK_POLYGON_MODE_LINE);
+    pipelineBuilder.Rasteriser = VulkanInitialisers::RasterisationStateCreateInfo(VK_POLYGON_MODE_FILL);
 
     // default multisampling (1 sample per pixel)
     pipelineBuilder.Multisampling = VulkanInitialisers::MultisamplingStateCreateInfo();

@@ -2,7 +2,7 @@
 
 void main()
 {
-    // const arry of positions for the triangle
+    // const array of positions for the triangle
     const vec3 positions[3] = vec3[3](
     vec3(1.0f, 1.0f, 0.0f),
     vec3(-1.0f, 1.0f, 0.0f),
