@@ -68,9 +68,11 @@ private:
 
     VkPipelineLayout _trianglePipelineLayout;
     VkPipeline _trianglePipeline;
+    VkPipeline _redTrianglePipeline;
 
     VkExtent2D _windowExtent{640, 320};
     struct SDL_Window *_window{nullptr};
     bool _isInitialized{false};
     int _frameNumber{0};
+    int _selectedShader{0};
 };

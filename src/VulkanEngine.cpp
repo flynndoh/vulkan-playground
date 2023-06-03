@@ -150,7 +150,16 @@ void VulkanEngine::Draw()
     // begin this render pass
     vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _trianglePipeline);
+    // render commands go here
+    if (_selectedShader == 0)
+    {
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _trianglePipeline);
+    }
+    else
+    {
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _redTrianglePipeline);
+    }
+
     vkCmdDraw(commandBuffer, 3, 1, 0, 0);
 
     // finalise this render pass
@@ -216,7 +225,21 @@ void VulkanEngine::Run()
         while (SDL_PollEvent(&e) != 0)
         {
             // close the window when user alt-f4s or clicks the X button
-            if (e.type == SDL_QUIT) { bQuit = true; }
+            if (e.type == SDL_QUIT)
+            {
+                bQuit = true;
+            }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                if (e.key.keysym.sym == SDLK_SPACE)
+                {
+                    _selectedShader += 1;
+                    if (_selectedShader > 1)
+                    {
+                        _selectedShader = 0;
+                    }
+                }
+            }
         }
 
         Draw();
@@ -416,6 +439,26 @@ void VulkanEngine::InitSyncStructures()
 
 void VulkanEngine::InitPipelines()
 {
+    VkShaderModule redTriangleFragmentShader; // TODO: this is currently leaked
+    if (!LoadShaderModule("../shaders/triangle.frag.spv", &redTriangleFragmentShader))
+    {
+        std::cout << "Error when building the triangle fragment shader module" << std::endl;
+    }
+    else
+    {
+        std::cout << "Triangle fragment shader successfully loaded" << std::endl;
+    }
+
+    VkShaderModule redTriangleVertexShader; // TODO: this is currently leaked
+    if (!LoadShaderModule("../shaders/triangle.vert.spv", &redTriangleVertexShader))
+    {
+        std::cout << "Error when building the triangle vertex shader module" << std::endl;
+    }
+    else
+    {
+        std::cout << "Triangle vertex shader successfully loaded" << std::endl;
+    }
+
     VkShaderModule triangleFragmentShader; // TODO: this is currently leaked
     if (!LoadShaderModule("../shaders/colouredTriangle.frag.spv", &triangleFragmentShader))
     {
@@ -485,9 +528,25 @@ void VulkanEngine::InitPipelines()
     // triangle layout
     pipelineBuilder.PipelineLayout = _trianglePipelineLayout;
 
-    // woot, lets build this fucker
+    // woot, lets build the coloured triangle pipeline
     _trianglePipeline = pipelineBuilder.BuildPipeline(_device, _renderPass);
 
+    // now we want to build another pipeline for the static red triangle
+    // first we need to clear the existing shader stages from the other triangle pipeline
+    pipelineBuilder.ShaderStages.clear();
+
+    // add the shaders for the static red triangle
+    pipelineBuilder.ShaderStages.push_back(
+            VulkanInitialisers::PipelineShaderStageCreateInfo(VK_SHADER_STAGE_VERTEX_BIT, redTriangleVertexShader)
+    );
+
+    // add fragment shader stage
+    pipelineBuilder.ShaderStages.push_back(
+            VulkanInitialisers::PipelineShaderStageCreateInfo(VK_SHADER_STAGE_FRAGMENT_BIT, redTriangleFragmentShader)
+    );
+
+    // build the static red triangle pipeline
+    _redTrianglePipeline = pipelineBuilder.BuildPipeline(_device, _renderPass);
 }
 
 bool VulkanEngine::LoadShaderModule(const char *filePath, VkShaderModule *outShaderModule)
