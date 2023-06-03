@@ -2,11 +2,11 @@
 # Add source to this project's executable.
 add_executable(cpp-vulkan
         main.cpp
-        vk_engine.cpp
-        vk_engine.h
-        vk_types.h
-        vk_initializers.cpp
-        vk_initializers.h)
+        VulkanEngine.cpp
+        VulkanEngine.h
+        VulkanTypes.h
+        VulkanInitialisers.cpp
+        VulkanInitialisers.h)
 
 
 set_property(TARGET cpp-vulkan PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:cpp-vulkan>")
