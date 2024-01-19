@@ -10,6 +10,11 @@ add_subdirectory(third-party)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
+#find_program(CLANGTIDY clang-tidy)
+#set(CMAKE_CXX_CLANG_TIDY "${CLANGTIDY};-extra-arg=-Wno-unknown-warning-option;-header-filter=${CMAKE_SOURCE_DIR}/src/*")
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 add_subdirectory(src)
 
 
