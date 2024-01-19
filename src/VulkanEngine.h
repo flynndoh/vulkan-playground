@@ -1,78 +1,81 @@
-﻿// cpp-vulkan.h : Include file for standard system include files,
-// or project specific include files.
+﻿#pragma once
 
-#pragma once
+#include "VulkanTypes.h"
 
-#include <VulkanTypes.h>
+#include <SDL_video.h>
 #include <vector>
 
-class VulkanEngine {
+namespace vulkan_engine
+{
 
-public:
-    //initializes everything in the engine
-    void Init();
+class VulkanEngine
+{
+  public:
+    // initializes everything in the engine
+    void init();
 
-    //shuts down the engine
-    void Cleanup() const;
+    // shuts down the engine
+    void cleanup() const;
 
-    //draw loop
-    void Draw();
+    // draw loop
+    void draw();
 
-    //run main loop
-    void Run();
+    // run main loop
+    void run();
 
-private:
-    void InitVulcan();
+  private:
+    void init_vulcan();
 
-    void InitSwapchain();
+    void init_swapchain();
 
-    void InitCommands();
+    void init_commands();
 
-    void InitDefaultRenderPass();
+    void init_default_render_pass();
 
-    VkAttachmentDescription CreateColourAttachment();
+    VkAttachmentDescription create_colour_attachment();
 
-    static VkSubpassDescription CreateSubpass();
+    static VkSubpassDescription create_subpass();
 
-    void InitFramebuffers();
+    void init_framebuffers();
 
-    void InitSyncStructures();
+    void init_sync_structures();
 
-    void InitPipelines();
+    void init_pipelines();
 
-    bool LoadShaderModule(const char *filePath, VkShaderModule *outShaderModule);
+    bool load_shader_module(const char *filePath, VkShaderModule *outShaderModule);
 
-private:
-    VkInstance _instance; // Vulkan library handle
-    VkDebugUtilsMessengerEXT _debugMessenger; // Vulkan debug output handle
-    VkPhysicalDevice _chosenGPU; // GPU chosen as the default hardware device
-    VkDevice _device; // Logical Vulkan device for commands
-    VkSurfaceKHR _surface; // Vulkan window service
+  private:
+    VkInstance _instance;                      // Vulkan library handle
+    VkDebugUtilsMessengerEXT _debug_messenger; // Vulkan debug output handle
+    VkPhysicalDevice _chosen_gpu;              // GPU chosen as the default hardware device
+    VkDevice _device;                          // Logical Vulkan device for commands
+    VkSurfaceKHR _surface;                     // Vulkan window service
 
     VkSwapchainKHR _swapchain;
-    VkFormat _swapchainImageFormat; // image format expected by the windowing system
-    std::vector<VkImage> _swapchainImages;
-    std::vector<VkImageView> _swapchainImageViews;
+    VkFormat _swapchain_image_format; // image format expected by the windowing system
+    std::vector<VkImage> _swapchain_images;
+    std::vector<VkImageView> _swapchain_image_views;
 
-    VkQueue _graphicsQueue; // queue that all render jobs will be submitted to
-    uint32_t _graphicsQueueFamily; // the above queue's family type
+    VkQueue _graphics_queue;         // queue that all render jobs will be submitted to
+    uint32_t _graphics_queue_family; // the above queue's family type
 
-    VkCommandPool _commandPool;
-    VkCommandBuffer _mainCommandBuffer; // the buffer that we will record into
+    VkCommandPool _command_pool;
+    VkCommandBuffer _main_command_buffer; // the buffer that we will record into
 
-    VkRenderPass _renderPass;
+    VkRenderPass _render_pass;
     std::vector<VkFramebuffer> _framebuffers;
 
-    VkSemaphore _presentSemaphore, _renderSemaphore;
-    VkFence _renderFence;
+    VkSemaphore _present_semaphore, _render_semaphore;
+    VkFence _render_fence;
 
-    VkPipelineLayout _trianglePipelineLayout;
-    VkPipeline _rainbowTrianglePipeline;
-    VkPipeline _redTrianglePipeline;
+    VkPipelineLayout _triangle_pipeline_layout;
+    VkPipeline _rainbow_triangle_pipeline;
+    VkPipeline _red_triangle_pipeline;
 
-    VkExtent2D _windowExtent{640, 320};
-    struct SDL_Window *_window{nullptr};
-    bool _isInitialized{false};
-    int _frameNumber{0};
-    int _selectedShader{0};
+    VkExtent2D _window_extent{640, 320};
+    SDL_Window *_window{nullptr};
+    bool _is_initialized{false};
+    int _frame_number{0};
+    int _selected_shader{0};
 };
+} // namespace vulkan_engine

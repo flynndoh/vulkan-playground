@@ -1,8 +1,8 @@
-﻿// cpp-vulkan.h : Include file for standard system include files,
-// or project specific include files.
+﻿#pragma once
 
-#pragma once
+#include "vulkan/vulkan.h"
 
-#include <vulkan/vulkan.h>
-
-//we will add our main reusable types here
+namespace vulkan_engine
+{
+// add main reusable types here
+}

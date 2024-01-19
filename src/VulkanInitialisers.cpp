@@ -1,137 +1,142 @@
-﻿#include <VulkanInitialisers.h>
+﻿#include "VulkanInitialisers.h"
 
-VkCommandPoolCreateInfo
-VulkanInitialisers::CommandPoolCreateInfo(uint32_t queueFamilyIndex, VkCommandPoolCreateFlags flags /*= 0*/)
+namespace vulkan_engine::initialisers
 {
-    VkCommandPoolCreateInfo commandPoolInfo = {}; // initialise entire struct to 0's
-    commandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    commandPoolInfo.pNext = nullptr;
+VkCommandPoolCreateInfo command_pool_create_info(uint32_t queueFamilyIndex, VkCommandPoolCreateFlags flags /*= 0*/)
+{
+    VkCommandPoolCreateInfo command_pool_info = {}; // initialise entire struct to 0's
+    command_pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    command_pool_info.pNext = nullptr;
 
     // command pool will be one that can submit graphics commands
-    commandPoolInfo.queueFamilyIndex = queueFamilyIndex;
+    command_pool_info.queueFamilyIndex = queueFamilyIndex;
 
     // we also want the pool to allow for the resetting of individual command buffers
-    commandPoolInfo.flags = flags;
-    return commandPoolInfo;
+    command_pool_info.flags = flags;
+    return command_pool_info;
 }
 
-VkCommandBufferAllocateInfo VulkanInitialisers::CommandBufferAllocateInfo(VkCommandPool pool, uint32_t count /*= 1*/,
-                                                                          VkCommandBufferLevel level /*= VK_COMMAND_BUFFER_LEVEL_PRIMARY*/)
+VkCommandBufferAllocateInfo command_buffer_allocate_info(
+    VkCommandPool pool, uint32_t count /*= 1*/, VkCommandBufferLevel level /*= VK_COMMAND_BUFFER_LEVEL_PRIMARY*/)
 {
-    VkCommandBufferAllocateInfo commandAllocInfo = {}; // initialise entire struct to 0's
-    commandAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    commandAllocInfo.pNext = nullptr;
+    VkCommandBufferAllocateInfo command_alloc_info = {}; // initialise entire struct to 0's
+    command_alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    command_alloc_info.pNext = nullptr;
 
-    // commands will be made from our _commandPool
-    commandAllocInfo.commandPool = pool;
+    // commands will be made from our _command_pool
+    command_alloc_info.commandPool = pool;
 
     // allocate 1 command buffer
-    commandAllocInfo.commandBufferCount = count;
+    command_alloc_info.commandBufferCount = count;
 
     // command level is primary
-    commandAllocInfo.level = level;
-    return commandAllocInfo;
+    command_alloc_info.level = level;
+    return command_alloc_info;
 }
 
-VkPipelineShaderStageCreateInfo
-VulkanInitialisers::PipelineShaderStageCreateInfo(VkShaderStageFlagBits stage, VkShaderModule shaderModule)
+VkPipelineShaderStageCreateInfo pipeline_shader_stage_create_info(VkShaderStageFlagBits stage,
+                                                                  VkShaderModule shaderModule)
 {
-    VkPipelineShaderStageCreateInfo shaderStageInfo = {}; // initialise entire struct to 0's
-    shaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    shaderStageInfo.pNext = nullptr;
-    shaderStageInfo.stage = stage; // shader stage
-    shaderStageInfo.module = shaderModule; // module containing the code for this shader stage
-    shaderStageInfo.pName = "main"; // the entry point of the shader
-    return shaderStageInfo;
+    VkPipelineShaderStageCreateInfo shader_stage_info = {}; // initialise entire struct to 0's
+    shader_stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shader_stage_info.pNext = nullptr;
+    shader_stage_info.stage = stage;         // shader stage
+    shader_stage_info.module = shaderModule; // module containing the code for this shader stage
+    shader_stage_info.pName = "main";        // the entry point of the shader
+    return shader_stage_info;
 }
 
-VkPipelineVertexInputStateCreateInfo VulkanInitialisers::VertexInputStateCreateInfo()
+VkPipelineVertexInputStateCreateInfo vertex_input_state_create_info()
 {
-    VkPipelineVertexInputStateCreateInfo vertexInputStateInfo = {}; // initialise entire struct to 0's
-    vertexInputStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputStateInfo.pNext = nullptr;
+    VkPipelineVertexInputStateCreateInfo vertex_input_state_info = {}; // initialise entire struct to 0's
+    vertex_input_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertex_input_state_info.pNext = nullptr;
 
     // no vertex bindings or attributes
-    vertexInputStateInfo.vertexBindingDescriptionCount = 0;
-    vertexInputStateInfo.vertexAttributeDescriptionCount = 0;
-    return vertexInputStateInfo;
+    vertex_input_state_info.vertexBindingDescriptionCount = 0;
+    vertex_input_state_info.vertexAttributeDescriptionCount = 0;
+    return vertex_input_state_info;
 }
 
-VkPipelineInputAssemblyStateCreateInfo VulkanInitialisers::InputAssemblyCreateInfo(VkPrimitiveTopology topology)
+VkPipelineInputAssemblyStateCreateInfo input_assembly_create_info(VkPrimitiveTopology topology)
 {
-    VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo = {}; // initialise entire struct to 0's
-    inputAssemblyStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    inputAssemblyStateInfo.pNext = nullptr;
+    VkPipelineInputAssemblyStateCreateInfo input_assembly_state_info = {}; // initialise entire struct to 0's
+    input_assembly_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    input_assembly_state_info.pNext = nullptr;
 
-    inputAssemblyStateInfo.topology = topology;
-    inputAssemblyStateInfo.primitiveRestartEnable = VK_FALSE;
-    return inputAssemblyStateInfo;
+    input_assembly_state_info.topology = topology;
+    input_assembly_state_info.primitiveRestartEnable = VK_FALSE;
+    return input_assembly_state_info;
 }
 
-VkPipelineRasterizationStateCreateInfo VulkanInitialisers::RasterisationStateCreateInfo(VkPolygonMode polygonMode)
+VkPipelineRasterizationStateCreateInfo rasterisation_state_create_info(VkPolygonMode polygonMode)
 {
-    VkPipelineRasterizationStateCreateInfo rasterisationStateInfo = {}; // initialise entire struct to 0's
-    rasterisationStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-    rasterisationStateInfo.pNext = nullptr;
+    VkPipelineRasterizationStateCreateInfo rasterisation_state_info = {}; // initialise entire struct to 0's
+    rasterisation_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rasterisation_state_info.pNext = nullptr;
 
-    rasterisationStateInfo.depthClampEnable = VK_FALSE;
+    rasterisation_state_info.depthClampEnable = VK_FALSE;
 
-    // if this is enabled, it will discard all primitives before the rasterisation stage which we don't want
-    rasterisationStateInfo.rasterizerDiscardEnable = VK_FALSE;
+    // if this is enabled, it will discard all primitives before the rasterisation
+    // stage which we don't want
+    rasterisation_state_info.rasterizerDiscardEnable = VK_FALSE;
 
     // polygon mode can be used to change between wireframe and solid drawing
-    rasterisationStateInfo.polygonMode = polygonMode;
-    rasterisationStateInfo.lineWidth = 1.0f;
+    rasterisation_state_info.polygonMode = polygonMode;
+    rasterisation_state_info.lineWidth = 1.0f;
 
     // disable backface culling
-    rasterisationStateInfo.cullMode = VK_CULL_MODE_NONE;
-    rasterisationStateInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    rasterisation_state_info.cullMode = VK_CULL_MODE_NONE;
+    rasterisation_state_info.frontFace = VK_FRONT_FACE_CLOCKWISE;
 
     // no depth bias
-    rasterisationStateInfo.depthBiasEnable = VK_FALSE;
-    rasterisationStateInfo.depthBiasConstantFactor = 0.0f;
-    rasterisationStateInfo.depthBiasClamp = 0.0f;
-    rasterisationStateInfo.depthBiasSlopeFactor = 0.0f;
-    return rasterisationStateInfo;
+    rasterisation_state_info.depthBiasEnable = VK_FALSE;
+    rasterisation_state_info.depthBiasConstantFactor = 0.0f;
+    rasterisation_state_info.depthBiasClamp = 0.0f;
+    rasterisation_state_info.depthBiasSlopeFactor = 0.0f;
+    return rasterisation_state_info;
 }
 
-VkPipelineMultisampleStateCreateInfo VulkanInitialisers::MultisamplingStateCreateInfo()
+VkPipelineMultisampleStateCreateInfo multisampling_state_create_info()
 {
-    VkPipelineMultisampleStateCreateInfo multisampleStateInfo = {}; // initialise entire struct to 0's
-    multisampleStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    multisampleStateInfo.pNext = nullptr;
+    VkPipelineMultisampleStateCreateInfo multisample_state_info = {}; // initialise entire struct to 0's
+    multisample_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    multisample_state_info.pNext = nullptr;
 
-    multisampleStateInfo.sampleShadingEnable = VK_FALSE;
+    multisample_state_info.sampleShadingEnable = VK_FALSE;
 
     // multisampling disabled by default (1 sample per pixel)
-    multisampleStateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-    multisampleStateInfo.minSampleShading = 1.0f;
-    multisampleStateInfo.pSampleMask = nullptr;
-    multisampleStateInfo.alphaToCoverageEnable = VK_FALSE;
-    multisampleStateInfo.alphaToOneEnable = VK_FALSE;
-    return multisampleStateInfo;
+    multisample_state_info.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    multisample_state_info.minSampleShading = 1.0f;
+    multisample_state_info.pSampleMask = nullptr;
+    multisample_state_info.alphaToCoverageEnable = VK_FALSE;
+    multisample_state_info.alphaToOneEnable = VK_FALSE;
+    return multisample_state_info;
 }
 
-VkPipelineColorBlendAttachmentState VulkanInitialisers::ColorBlendAttachmentState()
+VkPipelineColorBlendAttachmentState color_blend_attachment_state()
 {
-    VkPipelineColorBlendAttachmentState colorBlendAttachment = {}; // initialise entire struct to 0's
-    colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
-                                          VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;;
-    colorBlendAttachment.blendEnable = VK_FALSE; // no blending
-    return colorBlendAttachment;
+    VkPipelineColorBlendAttachmentState color_blend_attachment = {}; // initialise entire struct to 0's
+    color_blend_attachment.colorWriteMask =
+        VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+
+    color_blend_attachment.blendEnable = VK_FALSE; // no blending
+    return color_blend_attachment;
 }
 
-VkPipelineLayoutCreateInfo VulkanInitialisers::PipelineLayoutCreateInfo()
+VkPipelineLayoutCreateInfo pipeline_layout_create_info()
 {
-    VkPipelineLayoutCreateInfo layoutInfo = {}; // initialise struct to 0's
-    layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    layoutInfo.pNext = nullptr;
+    VkPipelineLayoutCreateInfo layout_info = {}; // initialise struct to 0's
+    layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    layout_info.pNext = nullptr;
 
     // just some empty defaults
-    layoutInfo.flags = 0;
-    layoutInfo.setLayoutCount = 0;
-    layoutInfo.pSetLayouts = nullptr;
-    layoutInfo.pushConstantRangeCount = 0; // shader currently has no inputs
-    layoutInfo.pPushConstantRanges = nullptr; // shader currently has no inputs
-    return layoutInfo;
+    layout_info.flags = 0;
+    layout_info.setLayoutCount = 0;
+    layout_info.pSetLayouts = nullptr;
+    layout_info.pushConstantRangeCount = 0;    // shader currently has no inputs
+    layout_info.pPushConstantRanges = nullptr; // shader currently has no inputs
+    return layout_info;
 }
+
+} // namespace vulkan_engine::initialisers

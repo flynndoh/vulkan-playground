@@ -1,27 +1,24 @@
-#ifndef CPP_VULKAN_PIPELINEBUILDER_H
-#define CPP_VULKAN_PIPELINEBUILDER_H
+#pragma once
 
+#include "vulkan/vulkan.h"
 
-#include <vulkan/vulkan.h>
 #include <vector>
 
-class PipelineBuilder {
+namespace vulkan_engine
+{
+class PipelineBuilder
+{
+  public:
+    VkPipeline build_pipeline(VkDevice device, VkRenderPass pass);
 
-public:
-    VkPipeline BuildPipeline(VkDevice device, VkRenderPass pass);
-
-public:
-    std::vector<VkPipelineShaderStageCreateInfo> ShaderStages;
-    VkPipelineVertexInputStateCreateInfo VertexInputInfo;
-    VkViewport Viewport;
-    VkRect2D Scissor;
-    VkPipelineRasterizationStateCreateInfo Rasteriser;
-    VkPipelineMultisampleStateCreateInfo Multisampling;
-    VkPipelineInputAssemblyStateCreateInfo InputAssembly;
-    VkPipelineColorBlendAttachmentState ColourBlendAttachment;
-    VkPipelineLayout PipelineLayout;
-
+    std::vector<VkPipelineShaderStageCreateInfo> shader_stages;
+    VkPipelineVertexInputStateCreateInfo vertex_input_info;
+    VkViewport viewport;
+    VkRect2D scissor;
+    VkPipelineRasterizationStateCreateInfo rasteriser;
+    VkPipelineMultisampleStateCreateInfo multisampling;
+    VkPipelineInputAssemblyStateCreateInfo input_assembly;
+    VkPipelineColorBlendAttachmentState colour_blend_attachment;
+    VkPipelineLayout pipeline_layout;
 };
-
-
-#endif //CPP_VULKAN_PIPELINEBUILDER_H
+} // namespace vulkan_engine
